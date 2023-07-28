@@ -8,11 +8,11 @@ app = Flask(__name__)
 CORS(app)
 
 # Configura la conexión a la base de datos MySQL utilizando las variables
-db_host = os.environ.get('DB_HOST')
-db_port = os.environ.get('DB_PORT')
-db_user = os.environ.get('DB_USER')
-db_password = os.environ.get('DB_PASSWORD')
-db_name = os.environ.get('DB_NAME')
+db_host = os.environ.get('MYSQLHOST')
+db_port = os.environ.get('MYSQLPORT')
+db_user = os.environ.get('MYSQLUSER')
+db_password = os.environ.get('MYSQLPASSWORD')
+db_name = os.environ.get('MYSQLDATABASE')
 
 db = mysql.connector.connect(
     host=db_host,
