@@ -1,9 +1,18 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import mysql.connector
+import os 
+from dotenv import load_dotenv
+
+from flask_sqlalchemy import SQLAlchemy
+
+load_dotenv()
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['MYSQL_URL']
 
 CORS(app)
+db = SQLAlchemy(app)
 
 # Ruta de inicio
 @app.route('/')
