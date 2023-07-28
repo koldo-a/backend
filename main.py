@@ -14,11 +14,11 @@ app = Flask(__name__)
 CORS(app)
 """ db = SQLAlchemy(app)
  """
-db_host = os.environ.get('DB_HOST') or '127.0.0.1'
-db_port = os.environ.get('DB_PORT') or '3306'
-db_user = os.environ.get('DB_USER') or 'root'
-db_password = os.environ.get('DB_PASSWORD') or 'estibaliZ1.'
-db_name = os.environ.get('DB_NAME') or 'fullstack_bottega'
+db_host = os.environ.get('DB_HOST')
+db_port = os.environ.get('DB_PORT')
+db_user = os.environ.get('DB_USER')
+db_password = os.environ.get('DB_PASSWORD')
+db_name = os.environ.get('DB_NAME')
 
 # Configura la conexión a la base de datos MySQL utilizando las variables
 db = mysql.connector.connect(
