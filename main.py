@@ -2,13 +2,25 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os 
 
-from flask_sqlalchemy import SQLAlchemy
-
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['MYSQL_URL']
 
 CORS(app)
-db = SQLAlchemy(app)
+
+# Configura la conexión a la base de datos MySQL utilizando las variables
+db_host = os.environ.get('DB_HOST')
+db_port = os.environ.get('DB_PORT')
+db_user = os.environ.get('DB_USER')
+db_password = os.environ.get('DB_PASSWORD')
+db_name = os.environ.get('DB_NAME')
+
+db = mysql.connector.connect(
+    host=db_host,
+    port=db_port,
+    user=db_user,
+    password=db_password,
+    database=db_name
+)
+
 
 # Ruta de inicio
 @app.route('/')
