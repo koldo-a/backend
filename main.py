@@ -4,16 +4,16 @@ import mysql.connector
 import os 
 from dotenv import load_dotenv
 
-from flask_sqlalchemy import SQLAlchemy
-
+""" from flask_sqlalchemy import SQLAlchemy
+ """
 load_dotenv()
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['MYSQL_URL']
-
+""" app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['MYSQL_URL']
+ """
 CORS(app)
-db = SQLAlchemy(app)
-
+""" db = SQLAlchemy(app)
+ """
 db_host = os.environ.get('DB_HOST') or '127.0.0.1'
 db_port = os.environ.get('DB_PORT') or '3306'
 db_user = os.environ.get('DB_USER') or 'root'
@@ -28,6 +28,12 @@ db = mysql.connector.connect(
     password=db_password,
     database=db_name
 )
+
+
+# Ruta de inicio
+@app.route('/')
+def home():
+    return jsonify({'message': '¡Bienvenido a la página de inicio!'})
 
 # Ruta para el registro de usuarios
 @app.route('/register', methods=['POST'])
