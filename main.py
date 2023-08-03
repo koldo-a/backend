@@ -208,4 +208,4 @@ def get_user_email(user_id):
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=os.getenv("PORT", default=5000))
+    app.run(host='0.0.0.0', port=os.getenv("PORT", default=5000))
