@@ -5,25 +5,23 @@ import mysql.connector
 
 app = Flask(__name__)
 
-# Configura la conexión a la base de datos MySQL utilizando las variables de entorno
+# Configura la conexión a la base de datos MySQL utilizando las variables
 db_host = os.environ.get('MYSQLHOST')
 db_port = os.environ.get('MYSQLPORT')
 db_user = os.environ.get('MYSQLUSER')
 db_password = os.environ.get('MYSQLPASSWORD')
 db_name = os.environ.get('MYSQLDATABASE')
 
-# Configura CORS para permitir todas las solicitudes (ajusta según tus necesidades)
-CORS(app)
+db = mysql.connector.connect(
+    host=db_host,
+    port=db_port,
+    user=db_user,
+    password=db_password,
+    database=db_name
+)
 
-# Función para conectar a la base de datos
-def connect_to_database():
-    return mysql.connector.connect(
-        host=db_host,
-        port=db_port,
-        user=db_user,
-        password=db_password,
-        database=db_name
-    )
+# Configura CORS permitiendo todas las solicitudes desde todos los orígenes (*)
+CORS(app)
 
 # Ruta de inicio
 @app.route('/')
@@ -34,35 +32,127 @@ def home():
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    email = data.get('email')
+    email = data['email']
 
-    if not email:
-        return jsonify({'error': 'Email is required'}), 400
+    # Verifica si el usuario ya está registrado
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users1 WHERE email_users=%s", (email,))
+    result = cursor.fetchone()
 
-    try:
-        # Conectar a la base de datos
-        db = connect_to_database()
+    if result is not None:
+        return jsonify({'message': 'El usuario ya está registrado'}), 400
+
+    # Inserta el nuevo usuario en la base de datos
+    cursor.execute("INSERT INTO users1 (email_users) VALUES (%s)", (email,))
+    db.commit()
+
+    return jsonify({'message': 'Registro exitoso'}), 200
+
+# Ruta para la autenticación de usuarios
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    email = data['email']
+
+    # Verifica si el usuario existe en la base de datos
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users1 WHERE email_users=%s", (email,))
+    result = cursor.fetchone()
+    if result is None:
+        unsuccess_message = f'Usuario con el email: {email} no se ha encontrado'
+        return jsonify({'message': unsuccess_message}), 404
+    else:
+        idusers = result[0]
+        success_message = f'Inicio de sesión exitoso para el usuario con id: {idusers} y el email:{email}'
+        # Retornar el mensaje de éxito junto con el idusers en la respuesta JSON
+        return jsonify({'message': success_message, 'idusers': idusers}), 200
+
+# Ruta para el cierre de sesión
+@app.route('/logout', methods=['GET'])
+def logout():
+    # Realiza las acciones necesarias para cerrar sesión, como limpiar las cookies o el estado de autenticación
+    return jsonify({'message': 'Sesión cerrada exitosamente'}), 200
+
+# Ruta para verificar el estado de autenticación
+@app.route('/check-authentication', methods=['GET'])
+def check_authentication():
+    # Aquí puedes realizar la lógica para verificar si el usuario está autenticado o no
+    # Puedes usar cookies, tokens u otros métodos de autenticación según tu implementación
+    # En este ejemplo, simplemente devolvemos un estado de autenticación aleatorio para demostración
+    is_authenticated = True  # Aquí debes implementar tu propia lógica de autenticación
+
+    return jsonify({'isLoggedIn': is_authenticated}), 200
+
+# Rutas para las operaciones CRUD
+@app.route('/items', methods=['GET', 'POST'])
+def handle_items():
+    if request.method == 'GET':
+        # Consulta SQL para obtener todos los registros de la tabla
+        query = 'SELECT * FROM items1'
+
+        # Ejecutar la consulta
         cursor = db.cursor()
+        cursor.execute(query)
 
-        # Verifica si el usuario ya está registrado
-        cursor.execute("SELECT * FROM users1 WHERE email_users=%s", (email,))
-        result = cursor.fetchone()
+        # Obtener los resultados y construir la lista de elementos
+        items = []
+        for item in cursor.fetchall():
+            item_data = {
+                'id': item[0],
+                'name': item[1],
+                'itemiduser': item[2]
+            }
+            items.append(item_data)
 
-        if result:
-            return jsonify({'message': 'El usuario ya está registrado'}), 400
+        return jsonify(items)
 
-        # Inserta el nuevo usuario en la base de datos
-        cursor.execute("INSERT INTO users1 (email_users) VALUES (%s)", (email,))
-        db.commit()
+    elif request.method == 'POST':
+        data = request.get_json()
+        item = data.get('name')
+        itemiduser = data.get('itemiduser')  # Obtener el id del usuario del cuerpo de la solicitud
 
-        return jsonify({'message': 'Registro exitoso'}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    finally:
-        cursor.close()
-        db.close()
+        if item and itemiduser:
+            try:
+                # Consulta SQL para insertar un nuevo registro en la tabla
+                query = 'INSERT INTO items1 (name, itemiduser) VALUES (%s, %s)'
 
-# ... (resto de las rutas)
+                # Datos del nuevo elemento
+                item_data = (item, itemiduser)
+
+                # Ejecutar la consulta
+                cursor = db.cursor()
+                cursor.execute(query, item_data)
+                db.commit()
+
+                return jsonify({'message': 'Item added successfully'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        else:
+            return jsonify({'error': 'Invalid item'}), 400
+
+# Rutas para las operaciones CRUD
+@app.route('/users', methods=['GET'])
+def handle_users():
+    if request.method == 'GET':
+        # Consulta SQL para obtener todos los registros de la tabla
+        query = 'SELECT * FROM users1 ORDER BY idusers'
+
+        # Ejecutar la consulta
+        cursor = db.cursor()
+        cursor.execute(query)
+
+        # Obtener los resultados y construir la lista de elementos
+        users = []
+        for u in cursor.fetchall():
+            u_data = {
+                'idusers': u[0],
+                'email_users': u[1]
+            }
+            users.append(u_data)
+
+        return jsonify(users)
+
+# Resto de las rutas y funciones aquí...
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=os.getenv("PORT", default=5000))
