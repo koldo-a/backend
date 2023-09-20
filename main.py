@@ -146,7 +146,7 @@ def handle_users():
         for u in cursor.fetchall():
             u_data = {
                 'idusers': u[0],
-                'name': u[1]
+                'email_users': u[1]
             }
             users.append(u_data)
 
