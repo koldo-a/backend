@@ -12,7 +12,7 @@ db_host = os.environ.get('MYSQLHOST')
 db_port = os.environ.get('MYSQLPORT')
 db_user = os.environ.get('MYSQLUSER')
 db_password = os.environ.get('MYSQLPASSWORD')
-db_name = os.environ.get('MYSQLDATABASE')
+db_name = os.environ.get('CLEARDB_DATABASE_URL')
 
 db = mysql.connector.connect(
     host=db_host,
@@ -208,4 +208,4 @@ def get_user_email(user_id):
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=os.getenv("PORT", default=5000))
+    app.run(host='0.0.0.0', port=os.getenv("PORT", default=5000))
