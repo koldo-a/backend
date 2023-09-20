@@ -12,7 +12,7 @@ db_host = os.environ.get('MYSQLHOST')
 db_port = os.environ.get('MYSQLPORT')
 db_user = os.environ.get('MYSQLUSER')
 db_password = os.environ.get('MYSQLPASSWORD')
-db_name = os.environ.get('CLEARDB_DATABASE_URL')
+db_name = os.environ.get('MYSQLDATABASE')
 
 db = mysql.connector.connect(
     host=db_host,
