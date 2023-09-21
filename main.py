@@ -169,7 +169,7 @@ def handle_item_by_index(index):
         return jsonify({'message': 'Item deleted successfully'})
 
     elif request.method == 'PUT':
-        new_name = input('Introduzca el nuevo valor: ')
+        new_name = request.json.get('name')
         
         if new_name:
             query = 'UPDATE items1 SET name = %s WHERE id = %s'
@@ -182,7 +182,8 @@ def handle_item_by_index(index):
 
             return jsonify({'message': 'Item editado correctamente'})
         else:
-            return jsonify({'error': 'Item invalido'})
+            return jsonify({'error': 'Item invalido'}) 
+        
 @app.route('/user/<int:user_id>', methods=['GET'])
 def get_user_email(user_id):
     try:
@@ -201,7 +202,3 @@ def get_user_email(user_id):
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-""" if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=os.getenv("PORT", default=5000)) """
