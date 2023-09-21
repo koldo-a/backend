@@ -26,7 +26,7 @@ CORS(app)
 # Ruta de inicio
 @app.route('/')
 def home():
-    return jsonify({'message': '¡Bienvenido a la página de inicio!'})
+    return jsonify({'message': '¡Bienvenido al Bakend de mi proyecto final para devCamp by Bottega!'})
 
 # Ruta para el registro de usuarios
 @app.route('/register', methods=['POST'])
