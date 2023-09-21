@@ -26,7 +26,7 @@ CORS(app)
 # Ruta de inicio
 @app.route('/')
 def home():
-    return jsonify({'message': '¡Bienvenido al Bakend de mi proyecto final para devCamp by Bottega!'})
+    return jsonify({'message': 'Welcome to my API! Bienvenido al Bakend de mi proyecto final para devCamp by Bottega!'})
 
 # Ruta para el registro de usuarios
 @app.route('/register', methods=['POST'])
@@ -169,7 +169,8 @@ def handle_item_by_index(index):
         return jsonify({'message': 'Item deleted successfully'})
 
     elif request.method == 'PUT':
-        new_name = request.json.get('name')
+        new_name = input('Introduzca el nuevo valor: ')
+        
         if new_name:
             query = 'UPDATE items1 SET name = %s WHERE id = %s'
 
@@ -179,10 +180,9 @@ def handle_item_by_index(index):
             cursor.execute(query, item_data)
             db.commit()
 
-            return jsonify({'message': 'Item edited successfully'})
+            return jsonify({'message': 'Item editado correctamente'})
         else:
-            return jsonify({'error': 'Invalid item'})
-
+            return jsonify({'error': 'Item invalido'})
 @app.route('/user/<int:user_id>', methods=['GET'])
 def get_user_email(user_id):
     try:
