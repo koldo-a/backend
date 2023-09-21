@@ -88,7 +88,7 @@ def check_authentication():
 def handle_items():
     if request.method == 'GET':
         # Consulta SQL para obtener todos los registros de la tabla
-        query = 'SELECT * FROM items1'
+        query = 'SELECT * FROM items1 ORDER BY id DESC'
 
         # Ejecutar la consulta
         cursor = db.cursor()
@@ -100,7 +100,8 @@ def handle_items():
             item_data = {
                 'id': item[0],
                 'name': item[1],
-                'itemiduser': item[2]
+                'itemiduser': item[2],
+                'fecha': item[3]
             }
             items.append(item_data)
 
@@ -154,5 +155,53 @@ def handle_users():
 
 # Resto de las rutas y funciones aquí...
 
+@app.route('/items/<int:index>', methods=['DELETE', 'PUT'])
+def handle_item_by_index(index):
+    if request.method == 'DELETE':
+        query = 'DELETE FROM items1 WHERE id = %s'
+
+        item_index = (index,)
+
+        cursor = db.cursor()
+        cursor.execute(query, item_index)
+        db.commit()
+
+        return jsonify({'message': 'Item deleted successfully'})
+
+    elif request.method == 'PUT':
+        new_name = request.json.get('name')
+        if new_name:
+            query = 'UPDATE items1 SET name = %s WHERE id = %s'
+
+            item_data = (new_name, index)
+
+            cursor = db.cursor()
+            cursor.execute(query, item_data)
+            db.commit()
+
+            return jsonify({'message': 'Item edited successfully'})
+        else:
+            return jsonify({'error': 'Invalid item'})
+
+@app.route('/user/<int:user_id>', methods=['GET'])
+def get_user_email(user_id):
+    try:
+        cursor = db.cursor()
+        cursor.execute("SELECT email_users FROM users1 WHERE idusers=%s", (user_id,))
+        result = cursor.fetchone()
+
+        if result is not None:
+            email = result[0]
+            return jsonify({'email_users': email}), 200
+        else:
+            return jsonify({'error': 'User not found'}), 404
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=os.getenv("PORT", default=5000))
+    app.run(debug=True)
+
+
+""" if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=os.getenv("PORT", default=5000)) """
